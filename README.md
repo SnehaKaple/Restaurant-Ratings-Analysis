@@ -1,78 +1,107 @@
+
 # Restaurant Ratings Analysis
 
-## Table of Content
+## Business Objective
 
-* [Case Study](#case-study)
-* [Dataset Description](#dataset-description)
-* [ER Diagram](#er-diagram)
-* [Data Cleaning](#data-cleaning)
-* [Data Analysis](#data-analysis)
-* [Dashboard](#dashboard)
+Analyze restaurant ratings and consumer behavior in Mexico to identify key factors influencing customer satisfaction, dining preferences, and operational attributes that contribute to higher restaurant ratings. The insights are intended to support restaurant owners and stakeholders in improving service quality, pricing strategy, and customer experience.
+
+---
+
+## Table of Contents
+
+* Case Study
+* Dataset Overview
+* Data Model (ER Diagram)
+* Data Preparation & Feature Engineering
+* Analysis Approach
+* Key Insights Summary
+* Detailed Insights
+* Dashboard Overview
+* Conclusion & Recommendations
+* Tools & Technologies
+
+---
 
 ## Case Study
-Restaurant ratings in Mexico by real consumers from 2012, including additional information about each restaurant and their cuisines, and each consumer and their preferences.
-## Dataset Description
-Our data set consists of the following observations which include:
 
-#### Consumers
-- **Consumer_ID** - Unique identifier for each consumer
-- **City** - City where the consumer lives
-- **State** - State where the consumer lives
-- **Country** - Country where the consumer lives
-- **Latitude** - Latitude where the consumer lives
-- **Longitude** - Longitude where the consumer lives
-- **Smoker** - Whether the consumer smokes or not
-- **Drink_Level** - Whether the consumer is an abstemious, casual, or social drinker
-- **Transportation_Method** - Whether the consumer transports on foot, by public transport, or by car
-- **Marital_Status** - The consumer's marital status (single or married)
-- **Children** - Whether the consumer has dependent/independent children or kids
-- **Age** - The consumer's age
-- **Occupation** - The consumer's occupation (student, employed, or unemployed)
-- **Budget** - The consumer's budget (low, medium, high)
+This case study explores restaurant ratings in Mexico (2012) collected from real consumers. The dataset includes detailed information about restaurants, cuisines, consumer demographics, preferences, and multiple rating dimensions (overall, food, and service). The goal is to derive actionable insights by combining relational data modeling, exploratory data analysis, and interactive visualization.
 
-#### Consumer_Preferences
-- **Consumer_ID** - Unique identifier for each consumer
-- **Preferred_Cuisine** - Types of food the consumer prefers
+---
 
-#### Ratings
-- **Consumer_ID** - Unique identifier for each consumer
-- **Restaurant_ID** -  Unique identifier for each restaurant
-- **Overall_Rating** - The overall rating by the consumer for the restaurant (0=Unsatisfactory, 1=Satisfactory, 2=Highly Satisfactory)
-- **Food_Rating** - The food's rating by the consumer for the restaurant (0=Unsatisfactory, 1=Satisfactory, 2=Highly Satisfactory)
-- **Service_Rating** - The service rating by the consumer for the restaurant (0=Unsatisfactory, 1=Satisfactory, 2=Highly Satisfactory)
+## Dataset Overview
 
-#### Restaurants
-- **Restaurant_ID** - Unique identifier for each restaurant
-- **Name** - The restaurant's name
-- **City** - The restaurant's city
-- **State** - The restaurant's state
-- **Country** - The restaurant's country
-- **Zip_Code** - The restaurant's zip code
-- **Latitude** - The restaurant's latitude
-- **Longitude** - The restaurant's longitude
-- **Alcohol_Service** - Whether the restaurant serves no alcohol, wine & beer, or a full bar
-- **Smoking_Allowed** - Whether any smoking is allowed, including in the bar or in smoking sections
-- **Price** - The restaurant's price (low, medium, high)
-- **Franchise** - Whether the restaurant is a franchise
-- **Area** - Whether the restaurant is in an open or closed area
-- **Parking** - Whether the restaurant offers any sort of parking (none, yes, public, valet)
+The dataset consists of multiple relational tables:
 
-#### Restaurant_Cuisines
-- **Restaurant_ID** -  Unique identifier for each restaurant
-- **Cuisine** -	Types of food the restaurant serves		
+### Consumers
 
-## ER Diagram
+* **Consumer_ID** – Unique identifier
+* **City, State, Country** – Location details
+* **Latitude, Longitude** – Geographic coordinates
+* **Smoker** – Smoking status
+* **Drink_Level** – Abstemious / Casual / Social
+* **Transportation_Method** – On foot / Public transport / Car
+* **Marital_Status** – Single / Married
+* **Children** – Dependent / Independent / Kids
+* **Age** – Consumer age
+* **Occupation** – Student / Employed / Unemployed
+* **Budget** – Low / Medium / High
+
+### Consumer_Preferences
+
+* **Consumer_ID** – Unique identifier
+* **Preferred_Cuisine** – Cuisine preferences
+
+### Ratings
+
+* **Consumer_ID** – Consumer identifier
+* **Restaurant_ID** – Restaurant identifier
+* **Overall_Rating** – 0 (Unsatisfactory), 1 (Satisfactory), 2 (Highly Satisfactory)
+* **Food_Rating** – 0, 1, 2 scale
+* **Service_Rating** – 0, 1, 2 scale
+
+### Restaurants
+
+* **Restaurant_ID** – Unique identifier
+* **Name** – Restaurant name
+* **City, State, Country** – Location
+* **Zip_Code** – Postal code
+* **Latitude, Longitude** – Geographic coordinates
+* **Alcohol_Service** – None / Wine & Beer / Full Bar
+* **Smoking_Allowed** – Smoking policy
+* **Price** – Low / Medium / High
+* **Franchise** – Franchise indicator
+* **Area** – Open / Closed area
+* **Parking** – None / Yes / Public / Valet
+
+### Restaurant_Cuisines
+
+* **Restaurant_ID** – Restaurant identifier
+* **Cuisine** – Cuisine served
+
+---
+
+## Data Model (ER Diagram)
+
+The dataset follows a relational structure connecting consumers, restaurants, cuisines, and ratings via primary and foreign keys. This design enables comprehensive analysis across demographics, preferences, and service attributes.
+
 ![Restaurant-ratings drawio](https://github.com/SnehaKaple/Restaurant-Ratings-Analysis/blob/main/ER-diagram.png)
 
-## Data Cleaning
-### Steps to import data as a folder
-1. Get data -> More -> All -> Folder -> Connect -> Path leading to the folder dataset -> Click ok
-2. Click on transform data -> Duplicate the file -> Click on Binary to expand the dataset (Repeat the set for the no of datasets)
-3. Calculated Fields
 
-#### Age Group
+---
+
+## Data Preparation & Feature Engineering
+
+### Data Import
+
+* Imported all datasets using **folder ingestion** in Power BI.
+* Transformed binary files and created individual tables for modeling.
+
+### Calculated Fields (DAX)
+
+**Age Group**
+
 ```
-AgeGroup = 
+AgeGroup =
 SWITCH(
     TRUE(),
     consumers[Age] <= 18, "Children and Adolescents",
@@ -82,119 +111,98 @@ SWITCH(
     "Seniors"
 )
 ```
-#### Service Rating Category
+
+**Rating Categories**
+
 ```
-Service_Rating_Category = SWITCH(
-    TRUE(),
-    ratings[Service_Rating] = 0, "Unsatisfactory",
-    ratings[Service_Rating] = 1, "Satisfactory",
-    "Highly Satisfactory"
-)
-```
-#### Overall Rating Category
-```
-Overall_Rating_Category = SWITCH(
-    TRUE(),
-    ratings[Overall_Rating] = 0, "Unsatisfactory",
-    ratings[Overall_Rating] = 1, "Satisfactory",
-    "Highly Satisfactory"
-)
-```
-#### Food Rating Category
-```
-Food_Rating_Category = SWITCH(
-    TRUE(),
-    ratings[Food_Rating] = 0, "Unsatisfactory",
-    ratings[Food_Rating] = 1, "Satisfactory",
-    "Highly Satisfactory"
-)
+Service_Rating_Category = SWITCH(TRUE(), ratings[Service_Rating] = 0, "Unsatisfactory", ratings[Service_Rating] = 1, "Satisfactory", "Highly Satisfactory")
+Overall_Rating_Category = SWITCH(TRUE(), ratings[Overall_Rating] = 0, "Unsatisfactory", ratings[Overall_Rating] = 1, "Satisfactory", "Highly Satisfactory")
+Food_Rating_Category    = SWITCH(TRUE(), ratings[Food_Rating] = 0, "Unsatisfactory", ratings[Food_Rating] = 1, "Satisfactory", "Highly Satisfactory")
 ```
 
-## Data Analysis
-### Local Insights:
-- What is the distribution of consumers by city and state?
+These transformations improved interpretability and supported business-focused reporting.
 
-    Most of the population is from San Luis Potosí, San Luis Potosí, while the second largest group is from Cuernavaca, Morelos.
+---
 
-- How does the age distribution of consumers vary by state?
+## Analysis Approach
 
-    In all three states, young adults under 30 years of age form the majority of the population. In two states, San Luis Potosí and Morelos, the second largest demographic consists of seniors, aged over 60 years.
+* Performed exploratory analysis across **location, demographics, and restaurant attributes**.
+* Compared ratings across **price levels, parking availability, alcohol service, and franchise status**.
+* Evaluated consumer behavior patterns related to **transportation, smoking, drinking habits, and budget**.
+* Identified top-performing restaurants based on **food, service, and overall ratings**.
 
-- What percentage of consumers are smokers or non-smokers in each city?
+---
 
-    The vast majority of consumers from all four cities are non-smokers, with Jiutepec having a 100% non-smoking population. In Cuernavaca city, smokers make up 25% of the population.
+## Key Insights Summary
 
-- How common is parking availability at restaurants in different cities?
-    
-    The majority of restaurants across all cities lack parking facilities, while some have parking available. In San Luis Potosí and Cuernavaca, two restaurants offer valet parking, while public parking is available in San Luis Potosí, Ciudad Victoria, and Cuernavaca.
+* Mexican cuisine is the most preferred across all consumer demographics.
+* Young adults (under 30) represent the largest consumer segment in all states.
+* Approximately **73% of restaurants are smoke-free**, aligning with majority consumer preferences.
+* Public transportation is the dominant travel mode for dining (**61% of consumers**).
+* Parking availability is more common among higher-priced restaurants.
 
-### Dining Insights:
-- How does the availability of parking correlate with restaurant price levels?
-    
-    Out of the 16 high-priced restaurants, 16 have parking available, with 3 offering valet parking, 1 providing public parking, and 5 lacking any parking options. Medium and low-priced restaurants do not offer valet parking; however, some provide public parking or have parking available, while others do not have parking available at all.
+---
 
-- What is the distribution of restaurants by state?
+## Detailed Insights
 
-    San Luis Potosí has 84 restaurants, whereas Morelos and Tamaulipas each have 23 restaurants.
-- How do restaurant franchises compare to non-franchises in terms of consumer ratings?
+### Local & Demographic Insights
 
-    The majority of the restaurants are non-franchises, and they are equally distributed across three rating categories: unsatisfactory, satisfactory, and highly satisfactory. A small portion of the restaurants are franchises, and they are also equally distributed across the same three rating categories.
+* San Luis Potosí has the highest concentration of consumers and restaurants.
+* Smokers form a minority across all cities; Jiutepec reports a fully non-smoking consumer base.
 
-- What are consumers' preferred cuisines based on their demographic profiles?
+### Dining & Hospitality Insights
 
-    Mexican cuisine is the most preferred, followed by American cuisine.
+* High-priced restaurants are more likely to offer parking and valet services.
+* Most restaurants do not serve alcohol; only a small portion operate full bars.
+* Non-franchise restaurants dominate the market and show balanced rating distributions.
 
+### Behavioral Insights
 
-### Hospitality Insights:
-- How does the type of alcohol service offered vary by restaurants in each city?
+* Students represent the majority occupation group, especially in San Luis Potosí and Tamaulipas.
+* Budget levels are primarily medium among students and employed consumers.
+* Drinking habits vary by state, with higher proportions of abstemious consumers in Morelos and Tamaulipas.
 
-    In the four cities combined—Jiutepec, San Luis Potosí, Cuernavaca, and Ciudad Victoria—66.92% of restaurants don't offer alcohol, 6.93% offer a full bar, and 26.15% offer wine and beer.
+### Review-Based Insights
 
-- What transportation methods are most commonly used by consumers?
+* **Top-performing restaurants** by overall satisfaction include Tortas Locas Hipocampo, Puesto de Tacos, and La Cantina Restaurante.
+* Food and service ratings show consistency among top-ranked restaurants, indicating stable quality perception.
 
-    61% of consumers use public transportation, 27% use cars, and 11% walk.
+---
 
-- How does the presence of alcohol service influence consumer ratings?
+## Dashboard Overview
 
-    Among non-drinkers, 303 rated their experience as highly satisfactory, 289 as satisfactory, and 170 as unsatisfactory. For wine and beer consumers, the ratings were 146 highly satisfactory, 105 satisfactory, and 68 unsatisfactory. At full bars, 37 rated highly satisfactory, 27 satisfactory, and 16 unsatisfactory.
+The Power BI dashboard provides:
 
-- What percentage of restaurants allow smoking in each state?
+* Interactive filters by city, state, and demographic attributes
+* Rating comparisons across food, service, and overall satisfaction
+* Visual analysis of cuisine popularity, parking availability, and alcohol service
 
-    Roughly 73% of restaurants maintain smoke-free policies, while only 1.5% in San Luis Potosí and Morelo allow smoking in bar sections. About 7% of restaurants permit smoking overall, with approximately 18.46% offering designated smoking areas.
-
-### Behavior Insights:
-- What are the common occupations of consumers in different state?
-
-    In San Luis Potosí, 93% of the population consists of students, with the remaining portion comprising both employed and unemployed individuals. In Morelos, the population is almost equally split between employed individuals and students. In Tamaulipas, 94% of the population are students, while the remaining 6% are employed.
-
-- How does the drink level (abstemious, casual, social) vary across different states?
-
-    In San Luis Potosí, almost 40% of the population are social drinkers, 36% are casual drinkers, and 23% are abstemious. In Morelos, 45% are abstemious, 41% are casual drinkers, and 12% are social drinkers. In Tamaulipas, 52% are abstemious, 31% are casual drinkers, and 15% are social drinkers.
-
-- How does marital status correlate with smoking or drinking habits?
-
-    Among 88 single consumers, all are non-smokers, with values decreasing respectively as abstemious, casual drinkers, and social drinkers. Among the married non-smokers, 2 are abstemious and 5 are social drinkers. Additionally, 23 single consumers smoke with values combined, and they are social drinkers and casual drinkers. Lastly, 2 married smokers are also social drinkers.
-
-- Is there a relationship between consumers' occupations and their budget levels?
-
-    Among the students, 67 have a medium budget, 33 have a low budget, and 4 have a high budget. Additionally, 15 employed individuals and 1 unemployed individual have a medium budget.
-
-### Review Insights: 
-- What are the top 5 restaurants by food rating?
-
-    The top 5 restaurants with high customer satisfaction - food ratings are Tortas Locas Hipocampo and Puesto de Tacos, where most consumers are highly satisfied. Cafeteria y Restaurante El Pacífico has 9 consumers rating it highly satisfactory, while Gorditas Doa Gloria has received 10. La Cantina Restaurante is rated highly satisfactory by 11 consumers, with the remaining votes split between satisfactory and unsatisfactory.
-
-- What are the top 5 restaurants by service rating?
-
-    The top 5 restaurants with high customer satisfaction for service ratings are Tortas Locas Hipocampo, where most consumers are satisfied. Puesto de Tacos has received 12 satisfied consumer ratings. Cafeteria y Restaurante El Pacífico also has 12 consumers rating it as satisfactory, while Gorditas Doña Gloria has received the same number. La Cantina Restaurante is rated satisfactory by 7 consumers, with the remaining votes split between highly satisfactory and unsatisfactory.
-
-- What are the top 5 restaurants by overall rating?
-
-    The top five restaurants with high customer satisfaction ratings are Tortas Locas Hipocampo, where most consumers are highly satisfied, and Puesto de Tacos, which has received 30 highly satisfied consumer ratings. Cafeteria y Restaurante El Pacífico follows closely with 24 consumers rating it as highly satisfactory, while La Cantina Restaurante boasts 28 highly satisfied ratings. Rounding out the list, Restaurant la Chalita has garnered 20 high satisfaction ratings from its customers.
-  
 ## Dashboard
 ![Restaurant Ratings Analysis_page-0001](https://github.com/SnehaKaple/Restaurant-Ratings-Analysis/blob/main/Report-1.jpg)
 ![Restaurant Ratings Analysis_page-0002](https://github.com/SnehaKaple/Restaurant-Ratings-Analysis/blob/main/Report-2.jpg)
 ![Restaurant Ratings Analysis_page-0003](https://github.com/SnehaKaple/Restaurant-Ratings-Analysis/blob/main/Report-3.jpg)
 ![Restaurant Ratings Analysis_page-0004](https://github.com/SnehaKaple/Restaurant-Ratings-Analysis/blob/main/Report-4.jpg)
 ![Restaurant Ratings Analysis_page-0005](https://github.com/SnehaKaple/Restaurant-Ratings-Analysis/blob/main/Report-5.jpg)
+
+
+---
+
+## Conclusion & Recommendations
+
+* Restaurants targeting young adults should focus on affordability and accessibility via public transport.
+* Maintaining smoke-free environments aligns strongly with consumer expectations.
+* Premium restaurants should ensure adequate parking facilities to support higher customer satisfaction.
+* Mexican cuisine remains a strong and consistent market opportunity across regions.
+
+---
+
+## Tools & Technologies
+
+* **Power BI** – Data modeling, DAX, interactive dashboards
+* **Excel** – Initial data inspection
+* **Relational Data Analysis** – Multi-table joins and ER modeling
+
+---
+
+
+
